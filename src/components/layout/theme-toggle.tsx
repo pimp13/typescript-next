@@ -13,18 +13,18 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <Button
       type="button"
       variant="ghost"
       size="icon"
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label="Toggle theme"
       disabled={!mounted}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {mounted && isDark ? <SunIcon /> : <MoonIcon />}
+      {isDark ? <SunIcon /> : <MoonIcon />}
     </Button>
   );
 }
