@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 px-6 py-16">
+    <main className="relative mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 px-6 py-16">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="space-y-3">
         <p className="text-sm font-medium text-muted-foreground">Funlife</p>
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Next.js + Fastify auth
+          Commerce dashboard, ready to grow
         </h1>
         <p className="max-w-xl text-muted-foreground">
-          TypeScript frontend with Tailwind and shadcn/ui, talking to your
-          Fastify JWT cookie API.
+          TypeScript frontend with feature-based architecture, React Query,
+          React Hook Form, shadcn/ui, and Fastify JWT auth.
         </p>
       </div>
 
@@ -21,7 +26,7 @@ export default function HomePage() {
           Create account
         </Button>
         <Button variant="secondary" render={<Link href="/dashboard" />}>
-          Dashboard
+          Open dashboard
         </Button>
       </div>
     </main>
