@@ -65,6 +65,8 @@ export function UsersTable({
           <TableRow>
             <TableHead>User</TableHead>
             <TableHead>Role</TableHead>
+            <TableHead className="hidden md:table-cell">Status</TableHead>
+            <TableHead className="hidden md:table-cell">Last Login</TableHead>
             <TableHead className="hidden md:table-cell">Created</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -98,6 +100,14 @@ export function UsersTable({
                   >
                     {user.role === "SUPER_ADMIN" ? "Super admin" : "User"}
                   </Badge>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground md:table-cell">
+                  <Badge variant={user.isActive ? "success" : "destructive"}>
+                    {user.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground md:table-cell">
+                  {user.lastLogin ? format(parseISO(user.lastLogin), "MMM d, yyyy") : 'Never'}
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
                   {format(parseISO(user.createdAt), "MMM d, yyyy")}
