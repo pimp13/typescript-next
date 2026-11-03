@@ -18,9 +18,6 @@ export function register(input: RegisterInput) {
 export function logout() {
   return apiFetch<undefined>("/api/auth/logout", {
     method: "POST",
-    headers: {
-      "Content-Type": "*/*",
-    },
   });
 }
 
