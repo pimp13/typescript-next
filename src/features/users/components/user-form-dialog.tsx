@@ -39,7 +39,7 @@ type UserFormDialogProps = {
   onSubmitUpdate: (values: {
     name: string;
     email: string;
-    role: "USER" | "SUPER_ADMIN";
+    role: "USER" | "SUPER_ADMIN" | "ADMIN_GENERAL";
     password?: string;
   }) => void;
 };
