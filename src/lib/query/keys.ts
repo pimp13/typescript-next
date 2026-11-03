@@ -18,4 +18,22 @@ export const queryKeys = {
     all: ["monitoring"] as const,
     overview: ["monitoring", "overview"] as const,
   },
+  chan: {
+    all: ["chan"] as const,
+    boards: ["chan", "boards"] as const,
+    threads: (
+      slug: string,
+      params: { mode: string; page: number },
+    ) => ["chan", "threads", slug, params] as const,
+    thread: (slug: string, threadId: string) =>
+      ["chan", "thread", slug, threadId] as const,
+  },
+  chanAdmin: {
+    all: ["chan-admin"] as const,
+    stats: ["chan-admin", "stats"] as const,
+    boards: ["chan-admin", "boards"] as const,
+    threads: ["chan-admin", "threads"] as const,
+    posts: ["chan-admin", "posts"] as const,
+    bans: ["chan-admin", "bans"] as const,
+  },
 } as const;

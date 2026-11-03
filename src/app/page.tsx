@@ -12,21 +12,21 @@ export default function HomePage() {
       <div className="space-y-3">
         <p className="text-sm font-medium text-muted-foreground">Funlife</p>
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Commerce dashboard, ready to grow
+          Modern imageboard + ops dashboard
         </h1>
         <p className="max-w-xl text-muted-foreground">
-          TypeScript frontend with feature-based architecture, React Query,
-          React Hook Form, shadcn/ui, and Fastify JWT auth.
+          Anonymous boards with catalogs, quotes, tripcodes, and moderation —
+          plus admin tools for users and live monitoring.
         </p>
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button render={<Link href="/login" />}>Sign in</Button>
-        <Button variant="outline" render={<Link href="/register" />}>
-          Create account
+        <Button render={<Link href="/chan" />}>Enter Chan</Button>
+        <Button variant="outline" render={<Link href="/login" />}>
+          Sign in
         </Button>
         <Button variant="secondary" render={<Link href="/dashboard" />}>
-          Open dashboard
+          Dashboard
         </Button>
       </div>
     </main>

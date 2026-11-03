@@ -18,6 +18,18 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
     title: "Monitoring",
     description: "Live system telemetry for super admins",
   },
+  "/dashboard/chan": {
+    title: "Chan admin",
+    description: "Imageboard operations overview",
+  },
+  "/dashboard/chan/boards": {
+    title: "Boards",
+    description: "Create and configure public boards",
+  },
+  "/dashboard/chan/moderation": {
+    title: "Moderation",
+    description: "Threads, posts, and bans",
+  },
 };
 
 export default function DashboardLayout({

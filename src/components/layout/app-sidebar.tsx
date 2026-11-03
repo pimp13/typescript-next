@@ -6,8 +6,9 @@ import {
   ActivityIcon,
   LayoutDashboardIcon,
   LifeBuoyIcon,
+  MessageSquareIcon,
   SettingsIcon,
-  ShoppingBagIcon,
+  ShieldIcon,
   UsersIcon,
 } from "lucide-react";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
@@ -26,19 +27,31 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
-const baseNavItems = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboardIcon },
-  { href: "/dashboard#orders", label: "Orders", icon: ShoppingBagIcon },
-  { href: "/dashboard#settings", label: "Settings", icon: SettingsIcon },
-] as const;
-
 export function AppSidebar() {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
+  const isAdmin =
+    user?.role === "SUPER_ADMIN" || user?.role === "ADMIN_GENERAL";
 
   const navItems = [
-    ...baseNavItems.slice(0, 1),
+    { href: "/dashboard", label: "Overview", icon: LayoutDashboardIcon },
+    { href: "/chan", label: "Open Chan", icon: MessageSquareIcon },
+    ...(isAdmin
+      ? [
+          { href: "/dashboard/chan", label: "Chan admin", icon: ShieldIcon },
+          {
+            href: "/dashboard/chan/boards",
+            label: "Boards",
+            icon: SettingsIcon,
+          },
+          {
+            href: "/dashboard/chan/moderation",
+            label: "Moderation",
+            icon: ShieldIcon,
+          },
+        ]
+      : []),
     ...(isSuperAdmin
       ? [
           { href: "/dashboard/users", label: "Users", icon: UsersIcon },
@@ -49,7 +62,6 @@ export function AppSidebar() {
           },
         ]
       : []),
-    ...baseNavItems.slice(1),
   ];
 
   return (
@@ -64,7 +76,7 @@ export function AppSidebar() {
           </span>
           <span className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-semibold tracking-tight">Funlife</span>
-            <span className="text-xs text-muted-foreground">Commerce OS</span>
+            <span className="text-xs text-muted-foreground">Chan + Ops</span>
           </span>
         </Link>
       </SidebarHeader>
@@ -80,7 +92,8 @@ export function AppSidebar() {
                   item.href === "/dashboard"
                     ? pathname === "/dashboard"
                     : pathname === item.href ||
-                      pathname.startsWith(`${item.href}/`);
+                      (item.href !== "/chan" &&
+                        pathname.startsWith(`${item.href}/`));
 
                 return (
                   <SidebarMenuItem key={item.href}>
