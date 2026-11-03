@@ -9,4 +9,9 @@ export const queryKeys = {
     orders: (status: string) => ["dashboard", "orders", status] as const,
     activity: ["dashboard", "activity"] as const,
   },
+  users: {
+    all: ["users"] as const,
+    list: (params: { search: string; role: string }) =>
+      ["users", "list", params] as const,
+  },
 } as const;

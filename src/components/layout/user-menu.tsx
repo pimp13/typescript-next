@@ -49,7 +49,7 @@ export function UserMenu() {
           <Button variant="ghost" size="icon" className="rounded-full" />
         }
       >
-        <Avatar size="sm">
+        <Avatar size="lg">
           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

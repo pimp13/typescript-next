@@ -9,6 +9,7 @@ import {
   ShoppingBagIcon,
   UsersIcon,
 } from "lucide-react";
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import {
   Sidebar,
   SidebarContent,
@@ -24,15 +25,24 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
-const navItems = [
+const baseNavItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboardIcon },
   { href: "/dashboard#orders", label: "Orders", icon: ShoppingBagIcon },
-  { href: "/dashboard#customers", label: "Customers", icon: UsersIcon },
   { href: "/dashboard#settings", label: "Settings", icon: SettingsIcon },
 ] as const;
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { data: user } = useCurrentUser();
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
+
+  const navItems = [
+    ...baseNavItems.slice(0, 1),
+    ...(isSuperAdmin
+      ? [{ href: "/dashboard/users", label: "Users", icon: UsersIcon }]
+      : []),
+    ...baseNavItems.slice(1),
+  ];
 
   return (
     <Sidebar collapsible="icon" variant="inset">
@@ -61,7 +71,8 @@ export function AppSidebar() {
                 const isActive =
                   item.href === "/dashboard"
                     ? pathname === "/dashboard"
-                    : pathname.startsWith(item.href);
+                    : pathname === item.href ||
+                      pathname.startsWith(`${item.href}/`);
 
                 return (
                   <SidebarMenuItem key={item.href}>
