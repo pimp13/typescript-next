@@ -1,4 +1,4 @@
-export type UserRole = "USER" | "SUPER_ADMIN";
+export type UserRole = "USER" | "SUPER_ADMIN" | "ADMIN_GENERAL";
 
 export type User = {
   id: string;
@@ -6,7 +6,7 @@ export type User = {
   email: string;
   role: UserRole;
   isActive: boolean;
-  lastLogin: string;
+  lastLogin: string | null;
   createdAt: string;
   updatedAt: string;
 };

@@ -95,10 +95,18 @@ export function UsersTable({
                 <TableCell>
                   <Badge
                     variant={
-                      user.role === "SUPER_ADMIN" ? "default" : "secondary"
+                      user.role === "SUPER_ADMIN"
+                        ? "default"
+                        : user.role === "ADMIN_GENERAL"
+                          ? "outline"
+                          : "secondary"
                     }
                   >
-                    {user.role === "SUPER_ADMIN" ? "Super admin" : "User"}
+                    {user.role === "SUPER_ADMIN"
+                      ? "Super admin"
+                      : user.role === "ADMIN_GENERAL"
+                        ? "General admin"
+                        : "User"}
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
@@ -107,7 +115,7 @@ export function UsersTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
-                  {user.lastLogin ? format(parseISO(user.lastLogin), "MMM d, yyyy") : 'Never'}
+                  {user.lastLogin ? format(parseISO(user.lastLogin), "MMM d, yyyy HH:mm") : 'Never'}
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
                   {format(parseISO(user.createdAt), "MMM d, yyyy")}

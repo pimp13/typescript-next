@@ -14,6 +14,10 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
     title: "User management",
     description: "Super admin controls for every account",
   },
+  "/dashboard/monitoring": {
+    title: "Monitoring",
+    description: "Live system telemetry for super admins",
+  },
 };
 
 export default function DashboardLayout({

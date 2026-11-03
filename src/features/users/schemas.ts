@@ -1,10 +1,14 @@
 import { z } from "zod";
 
-export const userRoleSchema = z.enum(["USER", "SUPER_ADMIN"]);
+export const userRoleSchema = z.enum([
+  "USER",
+  "SUPER_ADMIN",
+  "ADMIN_GENERAL",
+]);
 
 export const usersFiltersSchema = z.object({
   search: z.string().max(80),
-  role: z.enum(["ALL", "USER", "SUPER_ADMIN"]),
+  role: z.enum(["ALL", "USER", "SUPER_ADMIN", "ADMIN_GENERAL"]),
 });
 
 export const createUserSchema = z.object({

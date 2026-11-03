@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  ActivityIcon,
   LayoutDashboardIcon,
   LifeBuoyIcon,
   SettingsIcon,
@@ -39,7 +40,14 @@ export function AppSidebar() {
   const navItems = [
     ...baseNavItems.slice(0, 1),
     ...(isSuperAdmin
-      ? [{ href: "/dashboard/users", label: "Users", icon: UsersIcon }]
+      ? [
+          { href: "/dashboard/users", label: "Users", icon: UsersIcon },
+          {
+            href: "/dashboard/monitoring",
+            label: "Monitoring",
+            icon: ActivityIcon,
+          },
+        ]
       : []),
     ...baseNavItems.slice(1),
   ];
