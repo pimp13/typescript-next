@@ -173,6 +173,7 @@ export function UserFormDialog({
                     <SelectContent>
                       <SelectItem value="USER">User</SelectItem>
                       <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
+                      <SelectItem value="ADMIN_GENERAL">Admin General</SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -253,6 +254,7 @@ export function UserFormDialog({
                     <SelectContent>
                       <SelectItem value="USER">User</SelectItem>
                       <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
+                      <SelectItem value="ADMIN_GENERAL">Admin General</SelectItem>
                     </SelectContent>
                   </Select>
                 )}

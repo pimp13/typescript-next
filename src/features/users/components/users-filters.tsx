@@ -74,6 +74,7 @@ export function UsersFilters({ values, onChange }: UsersFiltersProps) {
                 <SelectItem value="ALL">All roles</SelectItem>
                 <SelectItem value="USER">User</SelectItem>
                 <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
+                <SelectItem value="ADMIN_GENERAL">Admin General</SelectItem>
               </SelectContent>
             </Select>
           )}
