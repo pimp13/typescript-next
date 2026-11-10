@@ -8,6 +8,7 @@ import {
   loginSchema,
   type LoginFormValues,
 } from "@/features/auth/schemas";
+import { startSsoLogin } from "@/features/sso/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +40,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Sign in</CardTitle>
         <CardDescription>
-          Use your email and password to access your account.
+          Use your email and password, or continue with Funlife SSO.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit((values) => loginMutation.mutate(values))}>
@@ -82,6 +83,18 @@ export function LoginForm() {
             disabled={loginMutation.isPending}
           >
             {loginMutation.isPending ? "Signing in..." : "Sign in"}
+          </Button>
+          <div className="relative w-full py-1 text-center text-xs text-muted-foreground">
+            <span className="bg-card relative z-10 px-2">or</span>
+            <span className="bg-border absolute inset-x-0 top-1/2 h-px -translate-y-1/2" />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={() => startSsoLogin()}
+          >
+            Continue with Funlife SSO
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
