@@ -1,8 +1,10 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+export const GO_API_URL = process.env.NEXT_PUBLIC_GO_API_URL ?? "http://localhost:7000/api";
 
 export type ApiResponse<T> = {
-  ok: boolean;
-  message: string;
+  ok?: boolean;
+  success?: boolean;
+  message?: string;
   data?: T;
 };
 
@@ -19,6 +21,7 @@ export class ApiError extends Error {
 export async function apiFetch<T>(
   path: string,
   init?: RequestInit,
+  basePath: string = API_URL,
 ): Promise<ApiResponse<T>> {
   const headers = new Headers(init?.headers);
 
@@ -26,7 +29,7 @@ export async function apiFetch<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(`${basePath}${path}`, {
     ...init,
     credentials: "include",
     headers,
@@ -34,7 +37,14 @@ export async function apiFetch<T>(
 
   const payload = (await response.json()) as ApiResponse<T>;
 
-  if (!response.ok || !payload.ok) {
+  // Go API uses `success`, Fastify uses `ok`. Accept either.
+  const succeeded =
+    response.ok &&
+    (payload.ok === true ||
+      payload.success === true ||
+      (payload.ok === undefined && payload.success === undefined));
+
+  if (!succeeded) {
     throw new ApiError(payload.message || "Request failed", response.status);
   }
 
