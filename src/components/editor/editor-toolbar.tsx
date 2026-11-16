@@ -68,11 +68,11 @@ function ToolbarButton({
               "size-8 shrink-0 rounded-lg text-muted-foreground",
               active && "bg-accent text-accent-foreground",
             )}
-          >
-            {children}
-          </Button>
+          />
         }
-      />
+      >
+        {children}
+      </TooltipTrigger>
       <TooltipContent side="bottom">{label}</TooltipContent>
     </Tooltip>
   );
@@ -80,7 +80,10 @@ function ToolbarButton({
 
 function ToolbarDivider() {
   return (
-    <Separator orientation="vertical" className="mx-0.5 hidden h-5 sm:block" />
+    <Separator
+      orientation="vertical"
+      className="mx-0.5 hidden h-5 sm:block"
+    />
   );
 }
 
@@ -115,7 +118,7 @@ export function EditorToolbar({ editor, disabled }: EditorToolbarProps) {
   return (
     <TooltipProvider delay={200}>
       <div className="sticky top-0 z-10 border-b border-border/70 bg-card/90 backdrop-blur-md">
-        <div className="flex max-w-full flex-wrap items-center gap-0.5 overflow-x-auto p-1.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-1 sm:p-2 [&::-webkit-scrollbar]:hidden">
+        <div className="flex flex-wrap items-center gap-0.5 p-1.5 sm:gap-1 sm:p-2">
           <ToolbarButton
             label="Undo"
             disabled={isDisabled || !editor.can().undo()}
@@ -279,7 +282,11 @@ export function EditorToolbar({ editor, disabled }: EditorToolbarProps) {
           >
             <LinkIcon className="size-4" />
           </ToolbarButton>
-          <ToolbarButton label="Image" disabled={isDisabled} onClick={addImage}>
+          <ToolbarButton
+            label="Image"
+            disabled={isDisabled}
+            onClick={addImage}
+          >
             <ImageIcon className="size-4" />
           </ToolbarButton>
         </div>
