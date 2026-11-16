@@ -30,6 +30,10 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
     title: "Moderation",
     description: "Threads, posts, and bans",
   },
+  "/dashboard/articles": {
+    title: "Articles",
+    description: "Manage articles",
+  },
 };
 
 export default function DashboardLayout({

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ActivityIcon,
+  BookIcon,
   LayoutDashboardIcon,
   LifeBuoyIcon,
   MessageSquareIcon,
@@ -50,6 +51,11 @@ export function AppSidebar() {
             label: "Moderation",
             icon: ShieldIcon,
           },
+          {
+            href: "/dashboard/articles",
+            label: "Articles",
+            icon: BookIcon
+          }
         ]
       : []),
     ...(isSuperAdmin
