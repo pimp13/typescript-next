@@ -14,6 +14,12 @@ export const queryKeys = {
     list: (params: { search: string; role: string }) =>
       ["users", "list", params] as const,
   },
+  articles: {
+    all: ["articles"] as const,
+    list: (params: { search: string; status: string }) =>
+      ["articles", "list", params] as const,
+    detail: (id: string) => ["articles", "detail", id] as const,
+  },
   monitoring: {
     all: ["monitoring"] as const,
     overview: ["monitoring", "overview"] as const,

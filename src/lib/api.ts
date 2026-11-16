@@ -1,11 +1,23 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
-export const GO_API_URL = process.env.NEXT_PUBLIC_GO_API_URL ?? "http://localhost:7000/api";
+export const GO_API_URL =
+  process.env.NEXT_PUBLIC_GO_API_URL ?? "http://localhost:7000/api";
 
 export type ApiResponse<T> = {
   ok?: boolean;
   success?: boolean;
   message?: string;
   data?: T;
+};
+
+type GoApiEnvelope<T> = {
+  result?: {
+    success?: boolean;
+    data?: T;
+    error?: {
+      code?: string;
+      message?: string;
+    } | null;
+  };
 };
 
 export class ApiError extends Error {
@@ -16,6 +28,29 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.status = status;
   }
+}
+
+function normalizePayload<T>(payload: unknown): ApiResponse<T> {
+  if (!payload || typeof payload !== "object") {
+    return {};
+  }
+
+  const record = payload as ApiResponse<T> & GoApiEnvelope<T>;
+
+  if (record.result && typeof record.result === "object") {
+    return {
+      success: record.result.success,
+      data: record.result.data,
+      message: record.result.error?.message,
+    };
+  }
+
+  return {
+    ok: record.ok,
+    success: record.success,
+    data: record.data,
+    message: record.message,
+  };
 }
 
 export async function apiFetch<T>(
@@ -35,9 +70,10 @@ export async function apiFetch<T>(
     headers,
   });
 
-  const payload = (await response.json()) as ApiResponse<T>;
+  const raw = (await response.json()) as unknown;
+  const payload = normalizePayload<T>(raw);
 
-  // Go API uses `success`, Fastify uses `ok`. Accept either.
+  // Go API uses nested `result.success`; Fastify uses top-level `ok`.
   const succeeded =
     response.ok &&
     (payload.ok === true ||
@@ -49,4 +85,8 @@ export async function apiFetch<T>(
   }
 
   return payload;
+}
+
+export function goApiFetch<T>(path: string, init?: RequestInit) {
+  return apiFetch<T>(path, init, GO_API_URL);
 }
