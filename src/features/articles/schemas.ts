@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { getEditorPlainText } from "@/components/editor/editor-utils";
 
 export const articleStatusSchema = z.enum(["draft", "published", "archived"]);
 
@@ -20,7 +21,12 @@ export const articleFormSchema = z.object({
     .string()
     .min(3, "Excerpt must be at least 3 characters")
     .max(500),
-  content: z.string().min(3, "Content must be at least 3 characters"),
+  content: z
+    .string()
+    .refine(
+      (value) => getEditorPlainText(value).length >= 3,
+      "Content must be at least 3 characters",
+    ),
   cover_image: z
     .string()
     .max(500)

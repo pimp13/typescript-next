@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/editor";
 
 type ArticleFormDialogProps = {
   open: boolean;
@@ -114,7 +115,7 @@ export function ArticleFormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"
+        className="max-h-[90vh] overflow-y-auto sm:max-w-3xl"
         showCloseButton
       >
         <DialogHeader>
@@ -264,11 +265,21 @@ export function ArticleFormDialog({
 
           <div className="grid gap-2">
             <Label htmlFor="article-content">Content</Label>
-            <Textarea
-              id="article-content"
-              rows={8}
-              className="min-h-40 font-mono text-sm"
-              {...form.register("content")}
+            <Controller
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <RichTextEditor
+                  id="article-content"
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  placeholder="Write the article body…"
+                  minHeight="16rem"
+                  aria-invalid={Boolean(form.formState.errors.content)}
+                  disabled={pending}
+                />
+              )}
             />
             {form.formState.errors.content ? (
               <p className="text-sm text-destructive">
