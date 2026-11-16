@@ -19,6 +19,8 @@ import type { Article } from "@/features/articles/types";
 import { ArticleFormDialog } from "@/features/articles/components/article-form-dialog";
 import { ArticlesFilters } from "@/features/articles/components/articles-filters";
 import { ArticlesGrid } from "@/features/articles/components/articles-grid";
+import { ArticlesTable } from "@/features/articles/components/articles-table";
+import type { ArticlesViewMode } from "@/features/articles/components/articles-view-toggle";
 import { DeleteArticleDialog } from "@/features/articles/components/delete-article-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +29,8 @@ const initialFilters: ArticlesFiltersValues = {
   search: "",
   status: "all",
 };
+
+const VIEW_MODE_KEY = "funlife.articles.viewMode";
 
 const adminRoles = new Set(["SUPER_ADMIN", "ADMIN_GENERAL"]);
 
@@ -40,10 +44,31 @@ export function ArticlesManagement() {
   } = useCurrentUser();
 
   const [filters, setFilters] = useState<ArticlesFiltersValues>(initialFilters);
+  const [viewMode, setViewMode] = useState<ArticlesViewMode>("grid");
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(VIEW_MODE_KEY);
+      if (stored === "grid" || stored === "table") {
+        setViewMode(stored);
+      }
+    } catch {
+      // ignore storage access errors
+    }
+  }, []);
+
+  const onViewModeChange = useCallback((mode: ArticlesViewMode) => {
+    setViewMode(mode);
+    try {
+      window.localStorage.setItem(VIEW_MODE_KEY, mode);
+    } catch {
+      // ignore storage access errors
+    }
+  }, []);
 
   const listParams = useMemo(
     () => ({
@@ -160,22 +185,44 @@ export function ArticlesManagement() {
         </div>
       </section>
 
-      <ArticlesFilters values={filters} onChange={onFiltersChange} />
-
-      <ArticlesGrid
-        articles={articles}
-        isLoading={articlesQuery.isLoading}
-        isError={articlesQuery.isError}
-        onEdit={(article) => {
-          setSelectedArticle(article);
-          setFormMode("edit");
-          setFormOpen(true);
-        }}
-        onDelete={(article) => {
-          setSelectedArticle(article);
-          setDeleteOpen(true);
-        }}
+      <ArticlesFilters
+        values={filters}
+        onChange={onFiltersChange}
+        viewMode={viewMode}
+        onViewModeChange={onViewModeChange}
       />
+
+      {viewMode === "grid" ? (
+        <ArticlesGrid
+          articles={articles}
+          isLoading={articlesQuery.isLoading}
+          isError={articlesQuery.isError}
+          onEdit={(article) => {
+            setSelectedArticle(article);
+            setFormMode("edit");
+            setFormOpen(true);
+          }}
+          onDelete={(article) => {
+            setSelectedArticle(article);
+            setDeleteOpen(true);
+          }}
+        />
+      ) : (
+        <ArticlesTable
+          articles={articles}
+          isLoading={articlesQuery.isLoading}
+          isError={articlesQuery.isError}
+          onEdit={(article) => {
+            setSelectedArticle(article);
+            setFormMode("edit");
+            setFormOpen(true);
+          }}
+          onDelete={(article) => {
+            setSelectedArticle(article);
+            setDeleteOpen(true);
+          }}
+        />
+      )}
 
       <ArticleFormDialog
         open={formOpen}

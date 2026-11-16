@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SparklesIcon, WrenchIcon } from "lucide-react";
 import {
   articleFormSchema,
   type ArticleFormValues,
 } from "@/features/articles/schemas";
+import {
+  normalizeSlugInput,
+  slugify,
+} from "@/features/articles/lib/slugify";
 import type { Article } from "@/features/articles/types";
+import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -37,6 +43,8 @@ type ArticleFormDialogProps = {
   onSubmit: (values: ArticleFormValues) => void;
 };
 
+type SlugMode = "auto" | "manual";
+
 const emptyValues: ArticleFormValues = {
   title: "",
   slug: "",
@@ -55,10 +63,15 @@ export function ArticleFormDialog({
   onSubmit,
 }: ArticleFormDialogProps) {
   const isEdit = mode === "edit";
+  const [slugMode, setSlugMode] = useState<SlugMode>("auto");
+
   const form = useForm<ArticleFormValues>({
     resolver: zodResolver(articleFormSchema),
     defaultValues: emptyValues,
   });
+
+  const titleValue = useWatch({ control: form.control, name: "title" });
+  const slugValue = useWatch({ control: form.control, name: "slug" });
 
   useEffect(() => {
     if (!open) return;
@@ -72,15 +85,38 @@ export function ArticleFormDialog({
         cover_image: article.cover_image ?? "",
         status: article.status,
       });
+      setSlugMode("manual");
       return;
     }
 
     form.reset(emptyValues);
+    setSlugMode("auto");
   }, [open, isEdit, article, form]);
+
+  useEffect(() => {
+    if (!open || slugMode !== "auto") return;
+    form.setValue("slug", slugify(titleValue ?? ""), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [open, slugMode, titleValue, form]);
+
+  const switchSlugMode = (next: SlugMode) => {
+    setSlugMode(next);
+    if (next === "auto") {
+      form.setValue("slug", slugify(form.getValues("title") ?? ""), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl" showCloseButton>
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"
+        showCloseButton
+      >
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit article" : "Create article"}</DialogTitle>
           <DialogDescription>
@@ -90,10 +126,7 @@ export function ArticleFormDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form
-          className="grid gap-4"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+        <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2 sm:col-span-2">
               <Label htmlFor="article-title">Title</Label>
@@ -105,13 +138,69 @@ export function ArticleFormDialog({
               ) : null}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="article-slug">Slug</Label>
+            <div className="grid gap-2 sm:col-span-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label htmlFor="article-slug">Slug</Label>
+                <div
+                  role="group"
+                  aria-label="Slug mode"
+                  className="inline-flex rounded-lg border border-border/70 bg-muted/50 p-0.5"
+                >
+                  <button
+                    type="button"
+                    onClick={() => switchSlugMode("auto")}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition",
+                      slugMode === "auto"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <SparklesIcon className="size-3" />
+                    Auto
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => switchSlugMode("manual")}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition",
+                      slugMode === "manual"
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    <WrenchIcon className="size-3" />
+                    Manual
+                  </button>
+                </div>
+              </div>
+
               <Input
                 id="article-slug"
-                placeholder="auto from title"
-                {...form.register("slug")}
+                readOnly={slugMode === "auto"}
+                placeholder={
+                  slugMode === "auto"
+                    ? "generated-from-title"
+                    : "my-custom-slug"
+                }
+                className={cn(
+                  "font-mono text-sm",
+                  slugMode === "auto" && "bg-muted/40 text-muted-foreground",
+                )}
+                value={slugValue ?? ""}
+                onChange={(event) => {
+                  if (slugMode !== "manual") return;
+                  form.setValue("slug", normalizeSlugInput(event.target.value), {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+                }}
               />
+              <p className="text-xs text-muted-foreground">
+                {slugMode === "auto"
+                  ? "Slug updates from the title; spaces become hyphens."
+                  : "Type freely — spaces are converted to hyphens as you type."}
+              </p>
               {form.formState.errors.slug ? (
                 <p className="text-sm text-destructive">
                   {form.formState.errors.slug.message}
@@ -119,7 +208,7 @@ export function ArticleFormDialog({
               ) : null}
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 sm:col-span-2 sm:max-w-xs">
               <Label htmlFor="article-status">Status</Label>
               <Controller
                 control={form.control}

@@ -3,6 +3,7 @@
 import { format, parseISO } from "date-fns";
 import { EyeIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { ArticleStatusBadge } from "@/features/articles/components/article-status-badge";
+import { ArticlesEmptyState } from "@/features/articles/components/articles-empty-state";
 import type { Article } from "@/features/articles/types";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,31 +53,11 @@ export function ArticlesGrid({
   }
 
   if (isError) {
-    return (
-      <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center">
-        <p className="text-sm font-medium text-foreground">
-          Could not load articles
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Sign in against the Go API and ensure you have{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">
-            articles:read
-          </code>
-          .
-        </p>
-      </div>
-    );
+    return <ArticlesEmptyState variant="error" />;
   }
 
   if (articles.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border/80 bg-card/40 px-6 py-16 text-center">
-        <p className="text-base font-medium tracking-tight">No articles yet</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Create your first draft to populate this workspace.
-        </p>
-      </div>
-    );
+    return <ArticlesEmptyState variant="empty" />;
   }
 
   return (
