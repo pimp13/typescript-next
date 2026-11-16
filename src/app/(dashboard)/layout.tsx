@@ -32,7 +32,7 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
   },
   "/dashboard/articles": {
     title: "Articles",
-    description: "Manage articles",
+    description: "Editorial workspace powered by the Go API",
   },
 };
 
