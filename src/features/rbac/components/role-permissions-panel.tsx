@@ -123,7 +123,12 @@ export function RolePermissionsPanel() {
             }}
           >
             <SelectTrigger className="w-full sm:w-[220px]">
-              <SelectValue placeholder="Select a role" />
+              <SelectValue placeholder="Select a role">
+                {(value: string | null) =>
+                  roles.find((role) => role.id === value)?.name ??
+                  "Select a role"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {roles.map((role) => (

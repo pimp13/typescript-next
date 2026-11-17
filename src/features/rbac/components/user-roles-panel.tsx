@@ -144,7 +144,13 @@ export function UserRolesPanel() {
                         }}
                       >
                         <SelectTrigger className="w-[200px]">
-                          <SelectValue placeholder="Select role" />
+                          <SelectValue placeholder="Select role">
+                            {(value: string | null) =>
+                              roles.find((role) => role.id === value)?.name ??
+                              user.role?.name ??
+                              "Select role"
+                            }
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           {roles.map((role) => (
