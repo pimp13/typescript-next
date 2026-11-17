@@ -49,7 +49,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const adminRoles = new Set(["SUPER_ADMIN", "ADMIN_GENERAL"]);
+const adminRoles = new Set(["SUPER_ADMIN"]);
 
 const initialFilters: CommentsFiltersValues = {
   search: "",

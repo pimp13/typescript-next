@@ -57,15 +57,15 @@ export function AppSidebar() {
             label: "Articles",
             icon: BookIcon,
           },
+        ]
+      : []),
+    ...(isSuperAdmin
+      ? [
           {
             href: "/dashboard/comments",
             label: "Comments",
             icon: MessageSquareIcon,
           },
-        ]
-      : []),
-    ...(isSuperAdmin
-      ? [
           { href: "/dashboard/users", label: "Users", icon: UsersIcon },
           {
             href: "/dashboard/monitoring",
