@@ -110,7 +110,7 @@ export function UserRolesPanel() {
               </TableRow>
             ) : (
               filtered.map((user) => {
-                const currentRoleId = user.role?.id ?? user.role_id ?? "";
+                const currentRoleId = user.role?.id ?? "";
                 const selectedRoleId = draftRoles[user.id] ?? currentRoleId;
                 const changed =
                   Boolean(selectedRoleId) && selectedRoleId !== currentRoleId;

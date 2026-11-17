@@ -2,7 +2,10 @@
 
 import { format, parseISO } from "date-fns";
 import { PencilIcon, Trash2Icon } from "lucide-react";
-import type { ManagedUser } from "@/features/users/types";
+import {
+  userDisplayName,
+  type ManagedUser,
+} from "@/features/users/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,6 +26,27 @@ type UsersTableProps = {
   onEdit: (user: ManagedUser) => void;
   onDelete: (user: ManagedUser) => void;
 };
+
+function roleBadgeVariant(slug: string) {
+  switch (slug) {
+    case "super_admin":
+      return "default" as const;
+    case "admin":
+    case "editor":
+      return "outline" as const;
+    default:
+      return "secondary" as const;
+  }
+}
+
+function formatMaybeDate(value?: string | null) {
+  if (!value) return "Never";
+  try {
+    return format(parseISO(value), "MMM d, yyyy HH:mm");
+  } catch {
+    return "—";
+  }
+}
 
 export function UsersTable({
   users,
@@ -45,7 +69,8 @@ export function UsersTable({
   if (isError) {
     return (
       <div className="rounded-xl border border-destructive/30 p-6 text-sm text-muted-foreground">
-        Could not load users. Make sure you are signed in as a super admin.
+        Could not load users. You need the <code>users:read</code> permission on
+        the Go API.
       </div>
     );
   }
@@ -74,13 +99,15 @@ export function UsersTable({
         <TableBody>
           {users.map((user) => {
             const isSelf = user.id === currentUserId;
+            const name = userDisplayName(user);
+            const slug = user.role?.slug ?? "user";
 
             return (
               <TableRow key={user.id}>
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="font-medium">
-                      {user.name}
+                      {name}
                       {isSelf ? (
                         <span className="ml-2 text-xs text-muted-foreground">
                           (you)
@@ -93,32 +120,28 @@ export function UsersTable({
                   </div>
                 </TableCell>
                 <TableCell>
+                  <Badge variant={roleBadgeVariant(slug)}>
+                    {user.role?.name || slug}
+                  </Badge>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground md:table-cell">
                   <Badge
                     variant={
-                      user.role === "SUPER_ADMIN"
-                        ? "default"
-                        : user.role === "ADMIN_GENERAL"
-                          ? "outline"
-                          : "secondary"
+                      user.status === "active"
+                        ? "success"
+                        : user.status === "banned"
+                          ? "destructive"
+                          : "warning"
                     }
                   >
-                    {user.role === "SUPER_ADMIN"
-                      ? "Super admin"
-                      : user.role === "ADMIN_GENERAL"
-                        ? "General admin"
-                        : "User"}
+                    {user.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
-                  <Badge variant={user.isActive ? "success" : "destructive"}>
-                    {user.isActive ? "Active" : "Inactive"}
-                  </Badge>
+                  {formatMaybeDate(user.last_login)}
                 </TableCell>
                 <TableCell className="hidden text-muted-foreground md:table-cell">
-                  {user.lastLogin ? format(parseISO(user.lastLogin), "MMM d, yyyy HH:mm") : 'Never'}
-                </TableCell>
-                <TableCell className="hidden text-muted-foreground md:table-cell">
-                  {format(parseISO(user.createdAt), "MMM d, yyyy")}
+                  {formatMaybeDate(user.created_at)}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="inline-flex items-center gap-1">
@@ -126,7 +149,7 @@ export function UsersTable({
                       type="button"
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Edit ${user.name}`}
+                      aria-label={`Edit ${name}`}
                       onClick={() => onEdit(user)}
                     >
                       <PencilIcon />
@@ -135,7 +158,7 @@ export function UsersTable({
                       type="button"
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Delete ${user.name}`}
+                      aria-label={`Delete ${name}`}
                       disabled={isSelf}
                       onClick={() => onDelete(user)}
                     >

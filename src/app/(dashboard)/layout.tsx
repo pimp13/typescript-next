@@ -12,7 +12,7 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
   },
   "/dashboard/users": {
     title: "User management",
-    description: "Super admin controls for every account",
+    description: "Create and manage accounts through the Go users API",
   },
   "/dashboard/monitoring": {
     title: "Monitoring",

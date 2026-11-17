@@ -49,7 +49,7 @@ export function UsersFilters({ values, onChange }: UsersFiltersProps) {
           <Input
             id="users-search"
             className="pl-8"
-            placeholder="Name or email..."
+            placeholder="Name, email, or username..."
             {...register("search")}
           />
         </div>
@@ -72,9 +72,10 @@ export function UsersFilters({ values, onChange }: UsersFiltersProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All roles</SelectItem>
-                <SelectItem value="USER">User</SelectItem>
-                <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
-                <SelectItem value="ADMIN_GENERAL">Admin General</SelectItem>
+                <SelectItem value="user">User</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="super_admin">Super admin</SelectItem>
               </SelectContent>
             </Select>
           )}

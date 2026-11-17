@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { goApiFetch } from "@/lib/api";
 import type {
   CreateUserInput,
   ListUsersParams,
@@ -13,36 +13,40 @@ function toQuery(params: ListUsersParams) {
     searchParams.set("search", params.search.trim());
   }
 
-  if (params.role) {
-    searchParams.set("role", params.role);
+  if (params.role?.trim()) {
+    searchParams.set("role", params.role.trim());
   }
 
   const query = searchParams.toString();
   return query ? `?${query}` : "";
 }
 
-export function listUsers(params: ListUsersParams = {}) {
-  return apiFetch<ManagedUser[]>(`/api/users${toQuery(params)}`, {
-    method: "GET",
-  });
+export async function listUsers(params: ListUsersParams = {}) {
+  const response = await goApiFetch<{ users: ManagedUser[] }>(
+    `/users/get-all${toQuery(params)}`,
+    { method: "GET" },
+  );
+  return response.data?.users ?? [];
 }
 
-export function createUser(input: CreateUserInput) {
-  return apiFetch<ManagedUser>("/api/users", {
+export async function createUser(input: CreateUserInput) {
+  const response = await goApiFetch<ManagedUser>("/users/create", {
     method: "POST",
     body: JSON.stringify(input),
   });
+  return response.data;
 }
 
-export function updateUser(id: string, input: UpdateUserInput) {
-  return apiFetch<ManagedUser>(`/api/users/${id}`, {
-    method: "PATCH",
+export async function updateUser(id: string, input: UpdateUserInput) {
+  const response = await goApiFetch<ManagedUser>(`/users/${id}`, {
+    method: "PUT",
     body: JSON.stringify(input),
   });
+  return response.data;
 }
 
-export function deleteUser(id: string) {
-  return apiFetch<ManagedUser>(`/api/users/${id}`, {
+export async function deleteUser(id: string) {
+  return goApiFetch<{ message: string }>(`/users/${id}`, {
     method: "DELETE",
   });
 }

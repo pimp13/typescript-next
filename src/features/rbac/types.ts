@@ -23,11 +23,10 @@ export type RbacUser = {
   email: string;
   username?: string;
   status?: string;
-  role_id?: string;
-  role?: {
-    id?: string;
-    slug?: string;
-    name?: string;
+  role: {
+    id: string;
+    slug: string;
+    name: string;
   };
 };
 

@@ -1,6 +1,9 @@
 "use client";
 
-import type { ManagedUser } from "@/features/users/types";
+import {
+  userDisplayName,
+  type ManagedUser,
+} from "@/features/users/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +30,8 @@ export function DeleteUserDialog({
   onOpenChange,
   onConfirm,
 }: DeleteUserDialogProps) {
+  const name = user ? userDisplayName(user) : "this user";
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -34,9 +39,7 @@ export function DeleteUserDialog({
           <AlertDialogTitle>Delete user?</AlertDialogTitle>
           <AlertDialogDescription>
             This permanently removes{" "}
-            <span className="font-medium text-foreground">
-              {user?.name ?? "this user"}
-            </span>{" "}
+            <span className="font-medium text-foreground">{name}</span>{" "}
             ({user?.email}). This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>

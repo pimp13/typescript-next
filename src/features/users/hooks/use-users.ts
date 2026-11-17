@@ -22,10 +22,7 @@ export function useUsers(params: ListUsersParams) {
       search: params.search ?? "",
       role: params.role ?? "ALL",
     }),
-    queryFn: async () => {
-      const response = await listUsers(params);
-      return response.data ?? [];
-    },
+    queryFn: () => listUsers(params),
   });
 }
 
@@ -36,6 +33,7 @@ export function useCreateUser() {
     mutationFn: (input: CreateUserInput) => createUser(input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.rbac.all });
       toast.success("User created");
     },
     onError: (error) => {
@@ -54,6 +52,7 @@ export function useUpdateUser() {
       updateUser(id, input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.rbac.all });
       await queryClient.invalidateQueries({ queryKey: queryKeys.auth.me });
       toast.success("User updated");
     },
@@ -72,6 +71,7 @@ export function useDeleteUser() {
     mutationFn: (id: string) => deleteUser(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.rbac.all });
       toast.success("User deleted");
     },
     onError: (error) => {

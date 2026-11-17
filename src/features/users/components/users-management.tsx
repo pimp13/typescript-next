@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlusIcon } from "lucide-react";
 import { ApiError } from "@/lib/api";
+import { hasPermission } from "@/features/auth/types";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import {
   useCreateUser,
@@ -11,7 +12,11 @@ import {
   useUpdateUser,
   useUsers,
 } from "@/features/users/hooks/use-users";
-import type { UsersFiltersValues } from "@/features/users/schemas";
+import type {
+  CreateUserFormValues,
+  UpdateUserFormValues,
+  UsersFiltersValues,
+} from "@/features/users/schemas";
 import type { ManagedUser } from "@/features/users/types";
 import { DeleteUserDialog } from "@/features/users/components/delete-user-dialog";
 import { UserFormDialog } from "@/features/users/components/user-form-dialog";
@@ -27,14 +32,23 @@ const initialFilters: UsersFiltersValues = {
 
 export function UsersManagement() {
   const router = useRouter();
-  const { data: currentUser, isLoading: isAuthLoading, isError, error } =
-    useCurrentUser();
+  const {
+    data: currentUser,
+    isLoading: isAuthLoading,
+    isError,
+    error,
+  } = useCurrentUser();
 
   const [filters, setFilters] = useState<UsersFiltersValues>(initialFilters);
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<ManagedUser | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const canRead = hasPermission(currentUser, "users:read");
+  const canCreate = hasPermission(currentUser, "users:create");
+  const canUpdate = hasPermission(currentUser, "users:update");
+  const canDelete = hasPermission(currentUser, "users:delete");
 
   const listParams = useMemo(
     () => ({
@@ -65,10 +79,10 @@ export function UsersManagement() {
   }, [error, isError, router]);
 
   useEffect(() => {
-    if (!isAuthLoading && currentUser && currentUser.role !== "SUPER_ADMIN") {
+    if (!isAuthLoading && currentUser && !canRead) {
       router.replace("/dashboard");
     }
-  }, [currentUser, isAuthLoading, router]);
+  }, [canRead, currentUser, isAuthLoading, router]);
 
   if (isAuthLoading || !currentUser) {
     return (
@@ -80,7 +94,7 @@ export function UsersManagement() {
     );
   }
 
-  if (currentUser.role !== "SUPER_ADMIN") {
+  if (!canRead) {
     return null;
   }
 
@@ -90,20 +104,22 @@ export function UsersManagement() {
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
           <p className="text-sm text-muted-foreground">
-            Create, update, and remove accounts across the platform.
+            Create, update, and remove accounts through the Go users API.
           </p>
         </div>
-        <Button
-          type="button"
-          onClick={() => {
-            setFormMode("create");
-            setSelectedUser(null);
-            setFormOpen(true);
-          }}
-        >
-          <PlusIcon data-icon="inline-start" />
-          Add user
-        </Button>
+        {canCreate ? (
+          <Button
+            type="button"
+            onClick={() => {
+              setFormMode("create");
+              setSelectedUser(null);
+              setFormOpen(true);
+            }}
+          >
+            <PlusIcon data-icon="inline-start" />
+            Add user
+          </Button>
+        ) : null}
       </div>
 
       <UsersFilters values={filters} onChange={onFiltersChange} />
@@ -114,11 +130,13 @@ export function UsersManagement() {
         isLoading={usersQuery.isLoading}
         isError={usersQuery.isError}
         onEdit={(user) => {
+          if (!canUpdate) return;
           setSelectedUser(user);
           setFormMode("edit");
           setFormOpen(true);
         }}
         onDelete={(user) => {
+          if (!canDelete) return;
           setSelectedUser(user);
           setDeleteOpen(true);
         }}
@@ -130,15 +148,25 @@ export function UsersManagement() {
         user={selectedUser}
         pending={createMutation.isPending || updateMutation.isPending}
         onOpenChange={setFormOpen}
-        onSubmitCreate={(values) => {
+        onSubmitCreate={(values: CreateUserFormValues) => {
           createMutation.mutate(values, {
             onSuccess: () => setFormOpen(false),
           });
         }}
-        onSubmitUpdate={(values) => {
+        onSubmitUpdate={(values: UpdateUserFormValues) => {
           if (!selectedUser) return;
           updateMutation.mutate(
-            { id: selectedUser.id, input: values },
+            {
+              id: selectedUser.id,
+              input: {
+                first_name: values.first_name,
+                last_name: values.last_name,
+                email: values.email,
+                role_slug: values.role_slug,
+                status: values.status,
+                ...(values.password ? { password: values.password } : {}),
+              },
+            },
             { onSuccess: () => setFormOpen(false) },
           );
         }}

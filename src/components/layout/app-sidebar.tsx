@@ -69,13 +69,15 @@ export function AppSidebar() {
             label: "Comments",
             icon: MessageSquareIcon,
           },
-          { href: "/dashboard/users", label: "Users", icon: UsersIcon },
           {
             href: "/dashboard/monitoring",
             label: "Monitoring",
             icon: ActivityIcon,
           },
         ]
+      : []),
+    ...(hasPermission(user, "users:read")
+      ? [{ href: "/dashboard/users", label: "Users", icon: UsersIcon }]
       : []),
     ...(canManageRoles
       ? [

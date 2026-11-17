@@ -32,13 +32,15 @@ type UserFormDialogProps = {
   user?: ManagedUser | null;
   pending?: boolean;
   onSubmitCreate: (values: CreateUserFormValues) => void;
-  onSubmitUpdate: (values: {
-    name: string;
-    email: string;
-    role: "USER" | "SUPER_ADMIN" | "ADMIN_GENERAL";
-    password?: string;
-  }) => void;
+  onSubmitUpdate: (values: UpdateUserFormValues) => void;
 };
+
+const roleOptions = [
+  { value: "user", label: "User" },
+  { value: "editor", label: "Editor" },
+  { value: "admin", label: "Admin" },
+  { value: "super_admin", label: "Super admin" },
+] as const;
 
 export function UserFormDialog({
   open,
@@ -55,20 +57,23 @@ export function UserFormDialog({
   const createForm = useForm<CreateUserFormValues>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
-      role: "USER",
+      role_slug: "user",
     },
   });
 
   const editForm = useForm<UpdateUserFormValues>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
-      role: "USER",
+      role_slug: "user",
+      status: "active",
     },
   });
 
@@ -76,20 +81,30 @@ export function UserFormDialog({
     if (!open) return;
 
     if (isEdit && user) {
+      const slug = (user.role?.slug || "user") as UpdateUserFormValues["role_slug"];
+      const status = (
+        ["active", "inactive", "banned"].includes(user.status)
+          ? user.status
+          : "active"
+      ) as UpdateUserFormValues["status"];
+
       editForm.reset({
-        name: user.name,
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: user.email,
         password: "",
-        role: user.role,
+        role_slug: slug,
+        status,
       });
       return;
     }
 
     createForm.reset({
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
-      role: "USER",
+      role_slug: "user",
     });
   }, [open, isEdit, user, createForm, editForm]);
 
@@ -101,8 +116,8 @@ export function UserFormDialog({
       title={isEdit ? "Edit user" : "Create user"}
       description={
         isEdit
-          ? "Update profile, role, or optionally reset the password."
-          : "Add a new account. Super admins can manage all users."
+          ? "Update profile, role, status, or optionally reset the password."
+          : "Add a new account through the Go users API."
       }
       footer={
         <ResponsiveModalActions>
@@ -129,23 +144,30 @@ export function UserFormDialog({
         <form
           id={formId}
           className="grid gap-4"
-          onSubmit={editForm.handleSubmit((values) => {
-            onSubmitUpdate({
-              name: values.name,
-              email: values.email,
-              role: values.role,
-              ...(values.password ? { password: values.password } : {}),
-            });
-          })}
+          onSubmit={editForm.handleSubmit(onSubmitUpdate)}
         >
-          <div className="grid gap-2">
-            <Label htmlFor="edit-name">Name</Label>
-            <Input id="edit-name" {...editForm.register("name")} />
-            {editForm.formState.errors.name ? (
-              <p className="text-sm text-destructive">
-                {editForm.formState.errors.name.message}
-              </p>
-            ) : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-first-name">First name</Label>
+              <Input
+                id="edit-first-name"
+                {...editForm.register("first_name")}
+              />
+              {editForm.formState.errors.first_name ? (
+                <p className="text-sm text-destructive">
+                  {editForm.formState.errors.first_name.message}
+                </p>
+              ) : null}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-last-name">Last name</Label>
+              <Input id="edit-last-name" {...editForm.register("last_name")} />
+              {editForm.formState.errors.last_name ? (
+                <p className="text-sm text-destructive">
+                  {editForm.formState.errors.last_name.message}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="grid gap-2">
@@ -177,29 +199,57 @@ export function UserFormDialog({
             ) : null}
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="edit-role">Role</Label>
-            <Controller
-              control={editForm.control}
-              name="role"
-              render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    if (value) field.onChange(value);
-                  }}
-                >
-                  <SelectTrigger id="edit-role" className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USER">User</SelectItem>
-                    <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
-                    <SelectItem value="ADMIN_GENERAL">Admin General</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-role">Role</Label>
+              <Controller
+                control={editForm.control}
+                name="role_slug"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value) field.onChange(value);
+                    }}
+                  >
+                    <SelectTrigger id="edit-role" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roleOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="edit-status">Status</Label>
+              <Controller
+                control={editForm.control}
+                name="status"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value) field.onChange(value);
+                    }}
+                  >
+                    <SelectTrigger id="edit-status" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="banned">Banned</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
           </div>
         </form>
       ) : (
@@ -208,14 +258,31 @@ export function UserFormDialog({
           className="grid gap-4"
           onSubmit={createForm.handleSubmit(onSubmitCreate)}
         >
-          <div className="grid gap-2">
-            <Label htmlFor="create-name">Name</Label>
-            <Input id="create-name" {...createForm.register("name")} />
-            {createForm.formState.errors.name ? (
-              <p className="text-sm text-destructive">
-                {createForm.formState.errors.name.message}
-              </p>
-            ) : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="create-first-name">First name</Label>
+              <Input
+                id="create-first-name"
+                {...createForm.register("first_name")}
+              />
+              {createForm.formState.errors.first_name ? (
+                <p className="text-sm text-destructive">
+                  {createForm.formState.errors.first_name.message}
+                </p>
+              ) : null}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="create-last-name">Last name</Label>
+              <Input
+                id="create-last-name"
+                {...createForm.register("last_name")}
+              />
+              {createForm.formState.errors.last_name ? (
+                <p className="text-sm text-destructive">
+                  {createForm.formState.errors.last_name.message}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="grid gap-2">
@@ -250,7 +317,7 @@ export function UserFormDialog({
             <Label htmlFor="create-role">Role</Label>
             <Controller
               control={createForm.control}
-              name="role"
+              name="role_slug"
               render={({ field }) => (
                 <Select
                   value={field.value}
@@ -262,9 +329,11 @@ export function UserFormDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="USER">User</SelectItem>
-                    <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
-                    <SelectItem value="ADMIN_GENERAL">Admin General</SelectItem>
+                    {roleOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               )}
