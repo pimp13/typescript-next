@@ -1,8 +1,11 @@
 import { goApiFetch } from "@/lib/api";
 import type {
   Article,
+  ArticleViewResult,
   CreateArticleInput,
   ListArticlesParams,
+  PublicArticleDetail,
+  PublicArticleSummary,
   UpdateArticleInput,
 } from "@/features/articles/types";
 
@@ -51,4 +54,30 @@ export function deleteArticle(id: string) {
   return goApiFetch<{ id: string }>(`/articles/${id}`, {
     method: "DELETE",
   });
+}
+
+export function listPublicArticles(params: { search?: string } = {}) {
+  const searchParams = new URLSearchParams();
+  if (params.search?.trim()) {
+    searchParams.set("search", params.search.trim());
+  }
+  const query = searchParams.toString();
+  return goApiFetch<PublicArticleSummary[]>(
+    `/public/articles${query ? `?${query}` : ""}`,
+    { method: "GET" },
+  );
+}
+
+export function getPublicArticle(slug: string) {
+  return goApiFetch<PublicArticleDetail>(
+    `/public/articles/${encodeURIComponent(slug)}`,
+    { method: "GET" },
+  );
+}
+
+export function recordPublicArticleView(slug: string) {
+  return goApiFetch<ArticleViewResult>(
+    `/public/articles/${encodeURIComponent(slug)}/view`,
+    { method: "POST" },
+  );
 }

@@ -22,6 +22,9 @@ export default function HomePage() {
 
       <div className="flex flex-wrap gap-3">
         <Button render={<Link href="/chan" />}>Enter Chan</Button>
+        <Button variant="outline" render={<Link href="/articles" />}>
+          Articles
+        </Button>
         <Button variant="outline" render={<Link href="/login" />}>
           Sign in
         </Button>

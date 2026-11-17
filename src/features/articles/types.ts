@@ -16,6 +16,37 @@ export type Article = {
   view_count: number;
 };
 
+export type PublicArticleSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  cover_image: string;
+  published_at: string | null;
+  author_name: string;
+  view_count: number;
+  created_at: string;
+};
+
+export type PublicArticleDetail = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  cover_image: string;
+  published_at: string | null;
+  author_name: string;
+  view_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArticleViewResult = {
+  slug: string;
+  view_count: number;
+};
+
 export type ListArticlesParams = {
   status?: ArticleStatus | "all";
   search?: string;

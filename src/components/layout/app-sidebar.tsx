@@ -37,6 +37,7 @@ export function AppSidebar() {
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboardIcon },
+    { href: "/articles", label: "Read articles", icon: BookIcon },
     { href: "/chan", label: "Open Chan", icon: MessageSquareIcon },
     ...(isAdmin
       ? [

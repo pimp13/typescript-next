@@ -20,6 +20,12 @@ export const queryKeys = {
       ["articles", "list", params] as const,
     detail: (id: string) => ["articles", "detail", id] as const,
   },
+  publicArticles: {
+    all: ["public-articles"] as const,
+    list: (params: { search: string }) =>
+      ["public-articles", "list", params] as const,
+    detail: (slug: string) => ["public-articles", "detail", slug] as const,
+  },
   monitoring: {
     all: ["monitoring"] as const,
     overview: ["monitoring", "overview"] as const,
