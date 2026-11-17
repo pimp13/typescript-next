@@ -38,6 +38,10 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
     title: "Comments",
     description: "Moderate reader discussion on articles",
   },
+  "/dashboard/authorization": {
+    title: "Authorization",
+    description: "Roles, permissions, and user access (Go RBAC)",
+  },
 };
 
 export default function DashboardLayout({

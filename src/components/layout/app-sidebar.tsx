@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   ActivityIcon,
   BookIcon,
+  KeyRoundIcon,
   LayoutDashboardIcon,
   LifeBuoyIcon,
   MessageSquareIcon,
@@ -12,6 +13,7 @@ import {
   ShieldIcon,
   UsersIcon,
 } from "lucide-react";
+import { hasPermission } from "@/features/auth/types";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import {
   Sidebar,
@@ -34,6 +36,7 @@ export function AppSidebar() {
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
   const isAdmin =
     user?.role === "SUPER_ADMIN" || user?.role === "ADMIN_GENERAL";
+  const canManageRoles = hasPermission(user, "roles:manage");
 
   const navItems = [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboardIcon },
@@ -71,6 +74,15 @@ export function AppSidebar() {
             href: "/dashboard/monitoring",
             label: "Monitoring",
             icon: ActivityIcon,
+          },
+        ]
+      : []),
+    ...(canManageRoles
+      ? [
+          {
+            href: "/dashboard/authorization",
+            label: "Authorization",
+            icon: KeyRoundIcon,
           },
         ]
       : []),

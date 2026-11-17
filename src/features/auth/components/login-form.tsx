@@ -40,7 +40,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Sign in</CardTitle>
         <CardDescription>
-          Use your email and password, or continue with Funlife SSO.
+          Sign in with the Go auth API (cookie session on the Go backend).
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit((values) => loginMutation.mutate(values))}>

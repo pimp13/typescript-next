@@ -29,7 +29,8 @@ export function RegisterForm() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
     },
@@ -40,26 +41,44 @@ export function RegisterForm() {
       <CardHeader>
         <CardTitle>Create account</CardTitle>
         <CardDescription>
-          Register to get a JWT cookie from the Fastify API.
+          Register against the Go auth API. You will be signed in after signup.
         </CardDescription>
       </CardHeader>
       <form
         onSubmit={handleSubmit((values) => registerMutation.mutate(values))}
       >
         <CardContent className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Pouya"
-              aria-invalid={Boolean(errors.name)}
-              {...register("name")}
-            />
-            {errors.name ? (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            ) : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <Label htmlFor="first_name">First name</Label>
+              <Input
+                id="first_name"
+                autoComplete="given-name"
+                placeholder="Pouya"
+                aria-invalid={Boolean(errors.first_name)}
+                {...register("first_name")}
+              />
+              {errors.first_name ? (
+                <p className="text-sm text-destructive">
+                  {errors.first_name.message}
+                </p>
+              ) : null}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="last_name">Last name</Label>
+              <Input
+                id="last_name"
+                autoComplete="family-name"
+                placeholder="Dev"
+                aria-invalid={Boolean(errors.last_name)}
+                {...register("last_name")}
+              />
+              {errors.last_name ? (
+                <p className="text-sm text-destructive">
+                  {errors.last_name.message}
+                </p>
+              ) : null}
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
@@ -81,7 +100,7 @@ export function RegisterForm() {
               id="password"
               type="password"
               autoComplete="new-password"
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
               aria-invalid={Boolean(errors.password)}
               {...register("password")}
             />
@@ -102,10 +121,7 @@ export function RegisterForm() {
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-foreground underline-offset-4 hover:underline"
-            >
+            <Link href="/login" className="underline underline-offset-4">
               Sign in
             </Link>
           </p>

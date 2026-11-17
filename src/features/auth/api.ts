@@ -1,28 +1,58 @@
-import { apiFetch } from "@/lib/api";
-import type { LoginInput, RegisterInput, User } from "./types";
+import { goApiFetch, type ApiResponse } from "@/lib/api";
+import {
+  mapGoAuthUser,
+  type GoAuthUser,
+  type GoSession,
+  type LoginInput,
+  type RegisterInput,
+  type User,
+} from "./types";
 
-export function login(input: LoginInput) {
-  return apiFetch<User>("/api/auth/login", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+function asUserResponse(
+  payload: ApiResponse<GoAuthUser | GoSession | User>,
+): ApiResponse<User> {
+  const raw = payload.data;
+  if (!raw) {
+    return { ...payload, data: undefined };
+  }
+
+  if ("user" in raw && raw.user) {
+    return { ...payload, data: mapGoAuthUser(raw.user) };
+  }
+
+  if ("first_name" in raw || "permissions" in raw) {
+    return { ...payload, data: mapGoAuthUser(raw as GoAuthUser) };
+  }
+
+  return payload as ApiResponse<User>;
 }
 
-export function register(input: RegisterInput) {
-  return apiFetch<User>("/api/auth/register", {
+export async function login(input: LoginInput) {
+  const response = await goApiFetch<GoSession>("/auth/login", {
     method: "POST",
     body: JSON.stringify(input),
   });
+  return asUserResponse(response);
+}
+
+export async function register(input: RegisterInput) {
+  await goApiFetch<GoAuthUser>("/auth/sign-up", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  // Go sign-up does not set the cookie — sign in immediately.
+  return login({ email: input.email, password: input.password });
 }
 
 export function logout() {
-  return apiFetch<undefined>("/api/auth/logout", {
+  return goApiFetch<{ message: string }>("/auth/logout", {
     method: "POST",
   });
 }
 
-export function getMe() {
-  return apiFetch<User>("/api/auth/me", {
+export async function getMe() {
+  const response = await goApiFetch<GoAuthUser>("/auth/me", {
     method: "GET",
   });
+  return asUserResponse(response);
 }

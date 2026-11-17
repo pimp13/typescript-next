@@ -36,6 +36,12 @@ export const queryKeys = {
     all: ["monitoring"] as const,
     overview: ["monitoring", "overview"] as const,
   },
+  rbac: {
+    all: ["rbac"] as const,
+    permissions: ["rbac", "permissions"] as const,
+    roles: ["rbac", "roles"] as const,
+    users: ["rbac", "users"] as const,
+  },
   chan: {
     all: ["chan"] as const,
     boards: ["chan", "boards"] as const,
