@@ -34,6 +34,10 @@ const pageMeta: Record<string, { title: string; description?: string }> = {
     title: "Articles",
     description: "Editorial workspace powered by the Go API",
   },
+  "/dashboard/comments": {
+    title: "Comments",
+    description: "Moderate reader discussion on articles",
+  },
 };
 
 export default function DashboardLayout({

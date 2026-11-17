@@ -26,6 +26,12 @@ export const queryKeys = {
       ["public-articles", "list", params] as const,
     detail: (slug: string) => ["public-articles", "detail", slug] as const,
   },
+  comments: {
+    all: ["comments"] as const,
+    public: (slug: string) => ["comments", "public", slug] as const,
+    list: (params: { search: string; status: string }) =>
+      ["comments", "list", params] as const,
+  },
   monitoring: {
     all: ["monitoring"] as const,
     overview: ["monitoring", "overview"] as const,

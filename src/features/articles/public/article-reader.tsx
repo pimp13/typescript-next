@@ -9,6 +9,7 @@ import {
   useRecordArticleView,
 } from "@/features/articles/hooks/use-public-articles";
 import { formatArticleDate } from "@/features/articles/lib/format-article-date";
+import { ArticleComments } from "@/features/comments/public/article-comments";
 import { RichTextContent } from "@/components/editor";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -135,6 +136,8 @@ export function ArticleReader({ slug }: ArticleReaderProps) {
           className="text-base leading-7 sm:text-[1.05rem] sm:leading-8"
         />
       </div>
+
+      <ArticleComments slug={slug} />
     </article>
   );
 }
