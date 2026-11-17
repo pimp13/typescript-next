@@ -26,6 +26,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SUPER_ADMIN_EMAIL } from "@/config/dashboard";
 
 export function UserRolesPanel() {
   const [search, setSearch] = useState("");
@@ -134,6 +135,7 @@ export function UserRolesPanel() {
                     </TableCell>
                     <TableCell>
                       <Select
+                        disabled={user.email === SUPER_ADMIN_EMAIL ? true : false}
                         value={selectedRoleId || undefined}
                         onValueChange={(value) => {
                           if (!value) return;
