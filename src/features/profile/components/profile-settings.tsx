@@ -16,6 +16,7 @@ import {
   type UpdateProfileFormValues,
 } from "@/features/profile/schemas";
 import { profilePath } from "@/features/profile/types";
+import { MediaField } from "@/components/media-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -172,19 +173,21 @@ export function ProfileSettings({
               />
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="profile-avatar">Avatar URL</Label>
-              <Input
-                id="profile-avatar"
-                placeholder="https://..."
-                {...profileForm.register("avatar")}
-              />
-              {profileForm.formState.errors.avatar ? (
-                <p className="text-sm text-destructive">
-                  {profileForm.formState.errors.avatar.message}
-                </p>
-              ) : null}
-            </div>
+            <MediaField
+              id="profile-avatar"
+              label="Avatar"
+              folder="avatars"
+              preview="avatar"
+              value={profileForm.watch("avatar")}
+              onChange={(url) => {
+                profileForm.setValue("avatar", url, {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                });
+              }}
+              disabled={updateMutation.isPending}
+              error={profileForm.formState.errors.avatar?.message}
+            />
 
             <div className="grid gap-2">
               <Label>Email</Label>

@@ -1,6 +1,20 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 export const GO_API_URL =
   process.env.NEXT_PUBLIC_GO_API_URL ?? "http://localhost:7000/api";
+export const GO_ORIGIN =
+  process.env.NEXT_PUBLIC_GO_ORIGIN ??
+  process.env.NEXT_PUBLIC_SSO_IDP_URL ??
+  "http://localhost:8080";
+
+/** Resolve a stored media path or absolute URL for display. */
+export function mediaURL(value?: string | null): string {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value) || value.startsWith("data:")) {
+    return value;
+  }
+  const path = value.startsWith("/") ? value : `/${value}`;
+  return `${GO_ORIGIN.replace(/\/$/, "")}${path}`;
+}
 
 export type ApiResponse<T> = {
   ok?: boolean;
@@ -59,8 +73,11 @@ export async function apiFetch<T>(
   basePath: string = API_URL,
 ): Promise<ApiResponse<T>> {
   const headers = new Headers(init?.headers);
+  const isFormData =
+    typeof FormData !== "undefined" && init?.body instanceof FormData;
 
-  if (init?.body != null && !headers.has("Content-Type")) {
+  // Let the browser set multipart boundaries for FormData.
+  if (init?.body != null && !headers.has("Content-Type") && !isFormData) {
     headers.set("Content-Type", "application/json");
   }
 

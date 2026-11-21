@@ -9,7 +9,7 @@ import {
   ShieldIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ApiError } from "@/lib/api";
+import { ApiError, mediaURL } from "@/lib/api";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { ProfileSettings } from "@/features/profile/components/profile-settings";
 import { usePublicProfile } from "@/features/profile/hooks/use-profile";
@@ -88,7 +88,7 @@ export function ProfilePage({ handle }: ProfilePageProps) {
         <div className="relative grid gap-6 p-6 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-end">
           <Avatar className="size-24 rounded-3xl border border-border/60 bg-background/80 shadow-sm sm:size-28">
             {profile.avatar ? (
-              <AvatarImage src={profile.avatar} alt={displayName} />
+              <AvatarImage src={mediaURL(profile.avatar)} alt={displayName} />
             ) : null}
             <AvatarFallback className="rounded-3xl text-2xl">
               {initials(displayName)}

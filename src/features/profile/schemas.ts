@@ -16,8 +16,11 @@ export const updateProfileSchema = z.object({
     .string()
     .max(500)
     .refine(
-      (value) => value === "" || /^https?:\/\//i.test(value),
-      "Avatar must be an http(s) URL",
+      (value) =>
+        value === "" ||
+        /^https?:\/\//i.test(value) ||
+        value.startsWith("/uploads/"),
+      "Avatar must be an http(s) URL or an uploaded media path",
     ),
 });
 

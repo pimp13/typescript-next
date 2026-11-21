@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LayoutDashboardIcon, LogOutIcon, UserIcon } from "lucide-react";
+import { mediaURL } from "@/lib/api";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 import { profilePath } from "@/features/profile/types";
@@ -51,7 +52,9 @@ export function UserMenu() {
         }
       >
         <Avatar size="lg">
-          {user.avatar ? <AvatarImage src={user.avatar} alt={user.name} /> : null}
+          {user.avatar ? (
+            <AvatarImage src={mediaURL(user.avatar)} alt={user.name} />
+          ) : null}
           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
