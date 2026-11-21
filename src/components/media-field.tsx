@@ -151,8 +151,8 @@ export function MediaField({
             disabled={busy}
             onClick={() => inputRef.current?.click()}
             className={cn(
-              "flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/80 bg-muted/30 px-4 py-8 text-sm text-muted-foreground transition-colors",
-              "hover:border-foreground/30 hover:bg-muted/50 hover:text-foreground",
+              "flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-foreground/30 bg-muted/30 px-4 py-8 text-sm text-muted-foreground transition-colors",
+              "hover:border-foreground/50 hover:bg-muted/50 hover:text-foreground",
               "disabled:pointer-events-none disabled:opacity-50",
             )}
           >
