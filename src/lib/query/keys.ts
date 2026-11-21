@@ -2,6 +2,10 @@ export const queryKeys = {
   auth: {
     me: ["auth", "me"] as const,
   },
+  profile: {
+    all: ["profile"] as const,
+    public: (handle: string) => ["profile", "public", handle] as const,
+  },
   dashboard: {
     all: ["dashboard"] as const,
     stats: (range: string) => ["dashboard", "stats", range] as const,

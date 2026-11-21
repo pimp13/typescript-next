@@ -17,6 +17,8 @@ export type User = {
   firstName?: string;
   lastName?: string;
   username?: string;
+  phone?: string;
+  avatar?: string;
   status?: string;
 };
 
@@ -40,6 +42,7 @@ export type GoAuthUser = {
   email: string;
   username?: string;
   phone?: string;
+  avatar?: string;
   role: string;
   permissions: string[];
   status: string;
@@ -76,6 +79,8 @@ export function mapGoAuthUser(user: GoAuthUser): User {
     firstName: user.first_name,
     lastName: user.last_name,
     username: user.username,
+    phone: user.phone,
+    avatar: user.avatar,
     status: user.status,
   };
 }

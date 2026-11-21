@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { LogOutIcon, UserIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon, UserIcon } from "lucide-react";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { profilePath } from "@/features/profile/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,6 +51,7 @@ export function UserMenu() {
         }
       >
         <Avatar size="lg">
+          {user.avatar ? <AvatarImage src={user.avatar} alt={user.name} /> : null}
           <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -58,14 +60,20 @@ export function UserMenu() {
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col gap-0.5">
               <span className="text-sm font-medium">{user.name}</span>
-              <span className="text-xs text-muted-foreground">{user.email}</span>
+              <span className="text-xs text-muted-foreground">
+                {user.username ? `@${user.username}` : user.email}
+              </span>
             </div>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem render={<Link href="/dashboard" />}>
+          <DropdownMenuItem render={<Link href={profilePath(user)} />}>
             <UserIcon />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/dashboard" />}>
+            <LayoutDashboardIcon />
             Dashboard
           </DropdownMenuItem>
         </DropdownMenuGroup>
