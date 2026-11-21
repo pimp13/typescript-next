@@ -1,10 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { MessageCircleIcon, ReplyIcon, SendIcon } from "lucide-react";
+import {
+  CornerDownRightIcon,
+  MessageCircleIcon,
+  ReplyIcon,
+  SendIcon,
+  XIcon,
+} from "lucide-react";
 import {
   useCreatePublicComment,
   usePublicComments,
@@ -19,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "cn";
 
 type ArticleCommentsProps = {
   slug: string;
@@ -32,35 +39,71 @@ function formatRelative(value: string) {
   }
 }
 
+function countThread(comments: ArticleComment[]): number {
+  return comments.reduce(
+    (total, comment) => total + 1 + countThread(comment.replies ?? []),
+    0,
+  );
+}
+
 function CommentItem({
   comment,
+  depth = 0,
   onReply,
 }: {
   comment: ArticleComment;
+  depth?: number;
   onReply: (comment: ArticleComment) => void;
 }) {
+  const isReply = depth > 0 || Boolean(comment.parent_id);
+  const replies = comment.replies ?? [];
+
   return (
-    <div className="space-y-3">
-      <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+    <div className={cn("space-y-3", isReply && "relative")}>
+      <article
+        className={cn(
+          "rounded-2xl border p-4 transition-colors",
+          isReply
+            ? "border-border/50 bg-muted/25"
+            : "border-border/70 bg-card/70 shadow-[0_1px_0_oklch(0_0_0/0.02)]",
+        )}
+      >
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-foreground/90 text-xs font-semibold text-background">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className={cn(
+                "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
+                isReply
+                  ? "bg-foreground/10 text-foreground"
+                  : "bg-foreground/90 text-background",
+              )}
+            >
               {comment.author_name.slice(0, 1).toUpperCase()}
             </div>
-            <div>
-              <p className="text-sm font-medium tracking-tight">
-                {comment.author_name}
-              </p>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                <p className="truncate text-sm font-medium tracking-tight">
+                  {comment.author_name}
+                </p>
+                {isReply ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+                    <CornerDownRightIcon className="size-2.5" />
+                    Reply
+                  </span>
+                ) : null}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {formatRelative(comment.created_at)}
               </p>
             </div>
           </div>
-          {!comment.parent_id ? (
+
+          {depth < 1 ? (
             <Button
               type="button"
               size="sm"
               variant="ghost"
+              className="shrink-0"
               onClick={() => onReply(comment)}
             >
               <ReplyIcon data-icon="inline-start" />
@@ -68,15 +111,22 @@ function CommentItem({
             </Button>
           ) : null}
         </div>
+
         <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
           {comment.body}
         </p>
-      </div>
+      </article>
 
-      {comment.replies && comment.replies.length > 0 ? (
-        <div className="space-y-3 border-l border-border/70 pl-4 sm:ml-4 sm:pl-5">
-          {comment.replies.map((reply) => (
-            <CommentItem key={reply.id} comment={reply} onReply={onReply} />
+      {replies.length > 0 ? (
+        <div className="relative space-y-3 border-l-2 border-foreground/10 pl-4 sm:ml-5 sm:pl-5">
+          <div className="absolute top-0 -left-px h-3 w-px bg-transparent" />
+          {replies.map((reply) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              depth={depth + 1}
+              onReply={onReply}
+            />
           ))}
         </div>
       ) : null}
@@ -88,6 +138,7 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
   const commentsQuery = usePublicComments(slug);
   const createMutation = useCreatePublicComment(slug);
   const [replyTo, setReplyTo] = useState<ArticleComment | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<PublicCommentFormValues>({
     resolver: zodResolver(publicCommentSchema),
@@ -99,12 +150,15 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
   });
 
   const comments = commentsQuery.data ?? [];
-  const totalCount = useMemo(() => {
-    return comments.reduce(
-      (count, item) => count + 1 + (item.replies?.length ?? 0),
-      0,
-    );
-  }, [comments]);
+  const totalCount = useMemo(() => countThread(comments), [comments]);
+
+  const handleReply = (comment: ArticleComment) => {
+    setReplyTo(comment);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => {
+      document.getElementById("comment-body")?.focus();
+    }, 250);
+  };
 
   return (
     <section className="mx-auto w-full max-w-3xl space-y-6 border-t border-border/70 pt-10">
@@ -121,6 +175,7 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
       </div>
 
       <form
+        ref={formRef}
         className="grid gap-3 rounded-2xl border border-border/70 bg-card/50 p-4 sm:p-5"
         onSubmit={form.handleSubmit((values) => {
           createMutation.mutate(
@@ -146,8 +201,9 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
         })}
       >
         {replyTo ? (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-muted/50 px-3 py-2 text-sm">
-            <span className="text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border/60 bg-[linear-gradient(135deg,oklch(0.97_0.02_170),oklch(0.96_0.02_95))] px-3 py-2.5 text-sm dark:bg-[linear-gradient(135deg,oklch(0.26_0.02_170),oklch(0.24_0.02_95))]">
+            <span className="inline-flex items-center gap-2 text-muted-foreground">
+              <CornerDownRightIcon className="size-3.5" />
               Replying to{" "}
               <span className="font-medium text-foreground">
                 {replyTo.author_name}
@@ -159,6 +215,7 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
               variant="ghost"
               onClick={() => setReplyTo(null)}
             >
+              <XIcon data-icon="inline-start" />
               Cancel
             </Button>
           </div>
@@ -190,11 +247,17 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
         </div>
 
         <div className="grid gap-1.5">
-          <Label htmlFor="comment-body">Comment</Label>
+          <Label htmlFor="comment-body">
+            {replyTo ? "Your reply" : "Comment"}
+          </Label>
           <Textarea
             id="comment-body"
             rows={4}
-            placeholder="Share your thoughts…"
+            placeholder={
+              replyTo
+                ? `Reply to ${replyTo.author_name}…`
+                : "Share your thoughts…"
+            }
             {...form.register("body")}
           />
           {form.formState.errors.body ? (
@@ -207,7 +270,11 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
         <div className="flex justify-end">
           <Button type="submit" disabled={createMutation.isPending}>
             <SendIcon data-icon="inline-start" />
-            {createMutation.isPending ? "Posting..." : "Post comment"}
+            {createMutation.isPending
+              ? "Posting..."
+              : replyTo
+                ? "Post reply"
+                : "Post comment"}
           </Button>
         </div>
       </form>
@@ -234,12 +301,12 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
         </div>
       ) : null}
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {comments.map((comment) => (
           <CommentItem
             key={comment.id}
             comment={comment}
-            onReply={setReplyTo}
+            onReply={handleReply}
           />
         ))}
       </div>
