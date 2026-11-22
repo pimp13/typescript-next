@@ -7,6 +7,7 @@ import {
   type CreateRoleFormValues,
 } from "@/features/rbac/schemas";
 import { useCreateRole } from "@/features/rbac/hooks/use-rbac";
+import { SaveButton } from "@/components/global/save-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -116,9 +117,12 @@ export function CreateRoleForm({ onClose }: CreateRoleFormProps) {
         >
           Cancel
         </Button>
-        <Button type="submit" disabled={createMutation.isPending}>
-          {createMutation.isPending ? "Creating..." : "Create role"}
-        </Button>
+        <SaveButton
+          isPending={createMutation.isPending}
+          loadingText="Creating..."
+        >
+          Create role
+        </SaveButton>
       </ResponsiveModalActions>
     </form>
   );

@@ -19,6 +19,7 @@ import {
   ResponsiveModalActions,
 } from "@/components/responsive-modal";
 import { RichTextEditor } from "@/components/editor";
+import { SaveButton } from "@/components/global/save-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -129,15 +130,13 @@ export function ArticleFormDialog({
           >
             Cancel
           </Button>
-          <Button type="submit" form={formId} disabled={pending}>
-            {pending
-              ? isEdit
-                ? "Saving..."
-                : "Creating..."
-              : isEdit
-                ? "Save changes"
-                : "Create article"}
-          </Button>
+          <SaveButton
+            form={formId}
+            isPending={pending}
+            loadingText={isEdit ? "Saving..." : "Creating..."}
+          >
+            {isEdit ? "Save changes" : "Create article"}
+          </SaveButton>
         </ResponsiveModalActions>
       }
     >

@@ -14,6 +14,7 @@ import {
   ResponsiveModal,
   ResponsiveModalActions,
 } from "@/components/responsive-modal";
+import { SaveButton } from "@/components/global/save-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -128,15 +129,13 @@ export function UserFormDialog({
           >
             Cancel
           </Button>
-          <Button type="submit" form={formId} disabled={pending}>
-            {pending
-              ? isEdit
-                ? "Saving..."
-                : "Creating..."
-              : isEdit
-                ? "Save changes"
-                : "Create user"}
-          </Button>
+          <SaveButton
+            form={formId}
+            isPending={pending}
+            loadingText={isEdit ? "Saving..." : "Creating..."}
+          >
+            {isEdit ? "Save changes" : "Create user"}
+          </SaveButton>
         </ResponsiveModalActions>
       }
     >

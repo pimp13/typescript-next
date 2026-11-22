@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ImageIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { SaveButton } from "@/components/global/save-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -157,15 +157,12 @@ export function ComposeForm({
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={pending}>
-          {pending
-            ? mode === "thread"
-              ? "Creating..."
-              : "Posting..."
-            : mode === "thread"
-              ? "Create thread"
-              : "Post reply"}
-        </Button>
+        <SaveButton
+          isPending={pending}
+          loadingText={mode === "thread" ? "Creating..." : "Posting..."}
+        >
+          {mode === "thread" ? "Create thread" : "Post reply"}
+        </SaveButton>
       </div>
     </form>
   );

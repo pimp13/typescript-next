@@ -9,6 +9,7 @@ import {
   type LoginFormValues,
 } from "@/features/auth/schemas";
 import { startSsoLogin } from "@/features/sso/api";
+import { SaveButton } from "@/components/global/save-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,13 +78,13 @@ export function LoginForm() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
-          <Button
-            type="submit"
+          <SaveButton
             className="w-full"
-            disabled={loginMutation.isPending}
+            isPending={loginMutation.isPending}
+            loadingText="Signing in..."
           >
-            {loginMutation.isPending ? "Signing in..." : "Sign in"}
-          </Button>
+            Sign in
+          </SaveButton>
           <div className="relative w-full py-1 text-center text-xs text-muted-foreground">
             <span className="bg-card relative z-10 px-2">or</span>
             <span className="bg-border absolute inset-x-0 top-1/2 h-px -translate-y-1/2" />

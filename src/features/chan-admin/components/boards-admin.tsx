@@ -13,6 +13,7 @@ import {
   useDeleteBoard,
   useUpdateBoard,
 } from "@/features/chan-admin/hooks/use-chan-admin";
+import { SaveButton } from "@/components/global/save-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,9 +172,12 @@ export function BoardsAdmin() {
           </label>
         </div>
         <div className="md:col-span-2">
-          <Button type="submit" disabled={createMutation.isPending}>
-            {createMutation.isPending ? "Creating..." : "Create board"}
-          </Button>
+          <SaveButton
+            isPending={createMutation.isPending}
+            loadingText="Creating..."
+          >
+            Create board
+          </SaveButton>
         </div>
       </form>
 

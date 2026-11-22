@@ -8,7 +8,7 @@ import {
   registerSchema,
   type RegisterFormValues,
 } from "@/features/auth/schemas";
-import { Button } from "@/components/ui/button";
+import { SaveButton } from "@/components/global/save-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -112,13 +112,13 @@ export function RegisterForm() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
-          <Button
-            type="submit"
+          <SaveButton
             className="w-full"
-            disabled={registerMutation.isPending}
+            isPending={registerMutation.isPending}
+            loadingText="Creating..."
           >
-            {registerMutation.isPending ? "Creating..." : "Create account"}
-          </Button>
+            Create account
+          </SaveButton>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link href="/login" className="underline underline-offset-4">

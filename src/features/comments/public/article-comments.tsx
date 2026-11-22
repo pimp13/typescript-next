@@ -20,6 +20,7 @@ import {
   type PublicCommentFormValues,
 } from "@/features/comments/schemas";
 import type { ArticleComment } from "@/features/comments/types";
+import { SaveButton } from "@/components/global/save-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -268,14 +269,13 @@ export function ArticleComments({ slug }: ArticleCommentsProps) {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={createMutation.isPending}>
-            <SendIcon data-icon="inline-start" />
-            {createMutation.isPending
-              ? "Posting..."
-              : replyTo
-                ? "Post reply"
-                : "Post comment"}
-          </Button>
+          <SaveButton
+            isPending={createMutation.isPending}
+            icon={SendIcon}
+            loadingText="Posting..."
+          >
+            {replyTo ? "Post reply" : "Post comment"}
+          </SaveButton>
         </div>
       </form>
 

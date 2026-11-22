@@ -7,8 +7,8 @@ import {
   useRbacRoles,
   useSetRolePermissions,
 } from "@/features/rbac/hooks/use-rbac";
+import { SaveButton } from "@/components/global/save-button";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -138,11 +138,13 @@ export function RolePermissionsPanel() {
               ))}
             </SelectContent>
           </Select>
-          <Button
+          <SaveButton
+            type="button"
+            icon={SaveIcon}
+            isPending={updateMutation.isPending}
             disabled={
               !hasChanges ||
               selectedCodes.size === 0 ||
-              updateMutation.isPending ||
               !selectedRoleId
             }
             onClick={() => {
@@ -162,9 +164,8 @@ export function RolePermissionsPanel() {
               );
             }}
           >
-            <SaveIcon className="size-4" />
-            {updateMutation.isPending ? "Saving..." : "Save changes"}
-          </Button>
+            Save changes
+          </SaveButton>
         </div>
       </div>
 

@@ -17,7 +17,7 @@ import {
 } from "@/features/profile/schemas";
 import { profilePath } from "@/features/profile/types";
 import { MediaField } from "@/components/media-field";
-import { Button } from "@/components/ui/button";
+import { SaveButton } from "@/components/global/save-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -198,10 +198,13 @@ export function ProfileSettings({
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={updateMutation.isPending}>
-                <SaveIcon data-icon="inline-start" />
-                {updateMutation.isPending ? "Saving..." : "Save profile"}
-              </Button>
+              <SaveButton
+                isPending={updateMutation.isPending}
+                icon={SaveIcon}
+                loadingText="Saving..."
+              >
+                Save profile
+              </SaveButton>
             </div>
           </form>
         </TabsContent>
@@ -264,12 +267,13 @@ export function ProfileSettings({
               ) : null}
             </div>
             <div className="flex justify-end">
-              <Button type="submit" disabled={passwordMutation.isPending}>
-                <KeyRoundIcon data-icon="inline-start" />
-                {passwordMutation.isPending
-                  ? "Updating..."
-                  : "Change password"}
-              </Button>
+              <SaveButton
+                isPending={passwordMutation.isPending}
+                icon={KeyRoundIcon}
+                loadingText="Updating..."
+              >
+                Change password
+              </SaveButton>
             </div>
           </form>
         </TabsContent>
